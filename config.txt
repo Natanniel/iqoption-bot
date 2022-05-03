@@ -25,10 +25,10 @@ usar_ciclos = S
 nivel_ciclos = 2
 
 [telegram]
-telegram_token = TOKEN DO BOT DO TELEGRAM
-telegram_id = ID DO TELEGRAM
+telegram_token = 5016590609:AAHAomWfXhshG5Wg4y1dri-EV83mT8qiPNM
+telegram_id = 782375549
 usar_bot = N
 
 [CONTA]
-email = adilson.junior-11@hotmail.com
-senha = Love Is Real, No?
+email = natanniel.alves@outlook.com
+senha = Pk192168@
