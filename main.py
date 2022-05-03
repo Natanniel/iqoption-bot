@@ -28,13 +28,17 @@ def configuracao():
 config = configuracao()
 ContaIQ = IQLogin(config['email'], config['senha'])
 
+#status = PegarStatusOperacao(ContaIQ, 16152196031)
+
+#print(status)
+#time.sleep(60)
 
 if(ContaIQ.check_connect() == True):
     ClearScreen()
     print("Conectado com saldo de :", ContaIQ.get_balance())
     banca = ObterValorBanca(ContaIQ)
     
-    
+        
 
     # Iniciando Atividade do BOT
     while True:
@@ -42,6 +46,7 @@ if(ContaIQ.check_connect() == True):
         lista = LeituraListaDeSinais()
         soro_ganhos = 0  # valor do ultimo ganho na operação soro      
 
+ 
         if len(lista) > 0:
             # acompanhar oportunidade pelo console log
             ClearScreen()
@@ -69,10 +74,10 @@ if(ContaIQ.check_connect() == True):
                             int(str(lista[0][0]).replace('M','')) # Tempo de gráfico
                         )
                         
-                        print('Realizou a operação e agora é necessário aguardar')
+                        print('Realizou a operação e agora é necessário aguardar. Operação ' + str(order_id))
                         time.sleep(int(str(lista[0][0]).replace('M','')) * 60 )
                         status = PegarStatusOperacao(ContaIQ,order_id)
-
+                        print(status)
                         # Se perdeu a operação irá zerar os soros e tambem o ciclo
                         if(status[0] == False) :
                             soro_ganhos = 0
@@ -86,7 +91,7 @@ if(ContaIQ.check_connect() == True):
                             print('ganhou')                            
                             ciclo += 1
                             soro_ganhos = 0.80
-                            time.sleep(60)
+                          
 
 
                     # SOROS Agressivo ele nao reicinia a alavancagem na perda
@@ -115,6 +120,8 @@ if(ContaIQ.check_connect() == True):
                     if(ciclo <= int(config['soros-nivel'])): 
                         ciclo = 0
                         soro_ganhos = 0
+
+                    time.sleep(60)
 
                     # SOROS agressivo conserva o aumento da aposta
                 # if config['soros-tipo'] == 'Agressivo':

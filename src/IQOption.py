@@ -22,7 +22,18 @@ def Operar(IQ, ativo, valor, acao, tempo):
     print(acao)
     print(tempo)
     status, order_id = IQ.buy_digital_spot_v2(ativo, valor, acao, tempo)
+
+    print(status)
+    print(IQ.check_win_digital_v2(buy_order_id = order_id))
     return order_id
 
 def PegarStatusOperacao(IQ, id):
-    return IQ.get_order(id)
+    print(IQ.get_position_history_v2(id, polling_time=1))
+    print('1 2 3')
+    return IQ.check_win_digital(id, polling_time=1)
+
+
+    
+
+    
+    
