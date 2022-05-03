@@ -1,1 +1,1 @@
-python forever.py
+python main.py

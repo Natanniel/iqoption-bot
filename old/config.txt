@@ -1,0 +1,34 @@
+[GERAL]
+entrada = 5
+entrada_percentual = N
+conta = PRACTICE
+# PRACTICE / REAL
+
+stop_win = 50
+stop_loss = 50
+trailing_stop = S
+trailing_stop_valor = 25
+payout = 80
+
+martingale = S
+mgProxSinal = N
+valorGale = 2.3
+niveis = 1
+
+analisarTendencia = S
+noticias = N
+timerzone = S
+hitVela = S
+
+[CICLOS]
+usar_ciclos = S
+nivel_ciclos = 2
+
+[telegram]
+telegram_token = 5016590609:AAHAomWfXhshG5Wg4y1dri-EV83mT8qiPNM
+telegram_id = 782375549
+usar_bot = N
+
+[CONTA]
+email =natanniel.alves@outlook.com
+senha =Pk192168@
