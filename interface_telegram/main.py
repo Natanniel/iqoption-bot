@@ -12,7 +12,8 @@ from dados import retornaTodosDadosDoUsuario,verificarUsuarioTemChatLogado,Vincu
 
 
 from menus.gerenciamento import entrarEmGerenciamento, alterarDelay,alterarStopWin,alterarStopLoss,alterarEmailIQ, alterarSenhaIQ,alterarModoReal
-from menus.modooperacao import entrarEmModoOperacao
+from menus.modooperacao import entrarEmModoOperacao, entrarEmModoMaoFixa, alterarMaoFixa
+from menus.lista import entrarEmLista,limparLista,adicionarLista
 #from core.usuario import verificaEmailCadastrado
 
 updater = Updater("5389773517:AAEzhBQZ5vTExZ7MsA77OzTKhtbdgjoWctM", use_context=True)
@@ -61,6 +62,12 @@ def verificaComandosDeAlteracao(mensagem):
     if(mensagem == 'Alterar Gerenciamento' or mensagem == 'Conta IQOption'):
         alteracao = True
     
+    if(mensagem == 'Alterar mão fixa'):
+        alteracao = True
+
+    if(mensagem == '❌ Limpar Lista' or mensagem == '✅ Adicionar Sinais'):
+        alteracao = True
+
     return alteracao
 
 def alteracao(update: Update, context: CallbackContext):
@@ -84,6 +91,17 @@ def alteracao(update: Update, context: CallbackContext):
         if(cliente[0][8] == 3):
             alterarModoReal(update,context)
 
+    # Operações
+    if(cliente[0][7] == 3):
+        if(cliente[0][8] == 1):
+            alterarMaoFixa(update,context)
+
+    # Lista
+    # Operações
+    if(cliente[0][7] == 10):
+        if(cliente[0][8] == 1):
+            limparLista(update,context)
+       
 
 def recepcionar(update: Update, context: CallbackContext):
     #configurarBaseDeDados()
@@ -114,28 +132,61 @@ def recepcionar(update: Update, context: CallbackContext):
                 #Verificar se o que o usuario esta tentando fazer é alguma alteração
                 if(verificaComandosDeAlteracao(update.message.text)):
                                     
+                    # 1 - Gerenciamento
+                    # 2 - Conta IQOption
+                    # 3 - Operação - Mão fixa
+                    # 10 - Limpar lista de Sinais
+                    # 11 - Adicionar lista de sinais
+
                     if(update.message.text == 'Alterar Gerenciamento'):
                         entrarModoAlteracao(update.message.chat_id, 1, 1)
                         update.message.reply_text("Informe o valor de Delay para cada operação :")      
 
                     if(update.message.text == 'Conta IQOption'):
                         entrarModoAlteracao(update.message.chat_id, 2, 1)
-                        update.message.reply_text("Informe seu email na IQOption :")      
+                        update.message.reply_text("Informe seu email na IQOption :")    
 
+                    if(update.message.text == 'Alterar mão fixa'):
+                        entrarModoAlteracao(update.message.chat_id, 3, 1) 
+                        update.message.reply_text("Informe o novo valor de mão fixa :")    
 
+                    if(update.message.text == '❌ Limpar Lista'):
+                        entrarModoAlteracao(update.message.chat_id, 10, 1) 
+                        update.message.reply_text("Deseja realmente excluir todos os seus sinais ? isso irá interromper as ações do bot. \n\nDigite S para Sim\nDigite N para Não :")    
+                    
+                    if(update.message.text == '✅ Adicionar Sinais'):
+                        entrarModoAlteracao(update.message.chat_id, 11, 1) 
+                        update.message.reply_text("Insira sua lista de sinais de acordo como foi passado para você")    
+                  
                 else:
 
                     if(update.message.text == '🧠 Gerênciamento'):
                         entrarEmGerenciamento(update,context)
 
                     else:
-                        if(update.message.text == '⚙️ Modo de Operação'):
+                        if(update.message.text == '⚙️ Modo de Operação' or update.message.text == 'Voltar p/ operações'):
                             entrarEmModoOperacao(update,context)
                         else:
-                            if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
-                                update.message.reply_text("Por favor informe um email válido")
+
+                            #Modo de Operação ======================
+                            if(update.message.text == '🖐️ Mão Fixa'):
+                                entrarEmModoMaoFixa(update,context)
                             else:
-                                validarEmail(update,context)       
+
+
+                                if(update.message.text == '🎯 Lista'):
+                                    entrarEmLista(update, context)
+                                else:
+                                    if(update.message.text == '❌ Limpar Lista'):
+                                        limparLista(update,context)
+                                    else:
+                                        if(update.message.text == '✅ Adicionar Sinais'):
+                                            adicionarLista(update,context)
+                                        else:
+                                            if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
+                                                update.message.reply_text("Por favor informe um email válido")
+                                            else:
+                                                validarEmail(update,context)       
 
     else: 
         validarEmail(update,context)
