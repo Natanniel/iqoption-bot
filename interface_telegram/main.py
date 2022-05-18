@@ -7,6 +7,7 @@ from telegram.ext.commandhandler import CommandHandler #Esta classe Handler é u
 from telegram.ext.messagehandler import MessageHandler #Esta classe Handler é usada para lidar com qualquer mensagem normal enviada pelo usuário ao bot
 from telegram.ext.filters import Filters # Isso filtrará texto normal, comandos, imagens, etc. de uma mensagem enviada.
 import re
+import os
 
 from dados import retornaTodosDadosDoUsuario,verificarUsuarioTemChatLogado,VinculaContaAoChatID, configurarBaseDeDados,verificaEmailExisteBaseDeDados,entrarModoAlteracao,verificaUsuarioEmAlteracao
 
@@ -14,9 +15,12 @@ from dados import retornaTodosDadosDoUsuario,verificarUsuarioTemChatLogado,Vincu
 from menus.gerenciamento import entrarEmGerenciamento, alterarDelay,alterarStopWin,alterarStopLoss,alterarEmailIQ, alterarSenhaIQ,alterarModoReal
 from menus.modooperacao import entrarEmModoOperacao, entrarEmModoMaoFixa, alterarMaoFixa
 from menus.lista import entrarEmLista,limparLista,adicionarLista
+from menus.operar import entrarEmOperar
 #from core.usuario import verificaEmailCadastrado
 
 updater = Updater("5389773517:AAEzhBQZ5vTExZ7MsA77OzTKhtbdgjoWctM", use_context=True)
+
+#updater = Updater("5394945805:AAFOW80oCpvDCZgGK6VrZ6U2qN_n_U6iS7o", use_context=True)
 
 
 
@@ -101,6 +105,11 @@ def alteracao(update: Update, context: CallbackContext):
     if(cliente[0][7] == 10):
         if(cliente[0][8] == 1):
             limparLista(update,context)
+
+    # adicionar itens a lista
+    if(cliente[0][7] == 11):
+         if(cliente[0][8] == 1):
+            adicionarLista(update,context)
        
 
 def recepcionar(update: Update, context: CallbackContext):
@@ -183,10 +192,21 @@ def recepcionar(update: Update, context: CallbackContext):
                                         if(update.message.text == '✅ Adicionar Sinais'):
                                             adicionarLista(update,context)
                                         else:
-                                            if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
-                                                update.message.reply_text("Por favor informe um email válido")
+
+                                            if(update.message.text ==  '🔂 Margin-Gale'):
+                                                update.message.reply_text("Não foi encontrado os parametros dessa função, por favor comunique o suporte")
+
                                             else:
-                                                validarEmail(update,context)       
+                                                if(update.message.text == '🤖 Operar'):
+                                                    entrarEmOperar(update,context)
+                                                 #   os.system('python operador.py ' + str(update.message.chat_id))
+                                                 #   update.message.reply_text("Falha ao se comunicar com a IQOption")
+                                                    
+                                                else:
+                                                    if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
+                                                        update.message.reply_text("Por favor informe um email válido")
+                                                    else:
+                                                        validarEmail(update,context)       
 
     else: 
         validarEmail(update,context)
