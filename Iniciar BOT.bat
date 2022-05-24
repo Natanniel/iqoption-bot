@@ -1,2 +1,1 @@
-cd interface_telegram
-python main.py
+python bot_telegram.py

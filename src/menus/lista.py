@@ -5,7 +5,7 @@ from telegram.ext.callbackcontext import CallbackContext # Não usaremos sua fun
 from telegram.ext.commandhandler import CommandHandler #Esta classe Handler é usada para lidar com qualquer comando enviado pelo usuário ao bot, um comando sempre começa com “/” ou seja, “/start”,”/help” etc.
 from telegram.ext.messagehandler import MessageHandler #Esta classe Handler é usada para lidar com qualquer mensagem normal enviada pelo usuário ao bot
 from telegram.ext.filters import Filters # Isso filtrará texto normal, comandos, imagens, etc. de uma mensagem enviada.
-from dados import executarComando, retornaTodosDadosDoUsuario
+from src.dados import executarComando, retornaTodosDadosDoUsuario
 
 def entrarEmLista(update: Update, context: CallbackContext):
    
@@ -43,9 +43,9 @@ def limparLista(update: Update, context: CallbackContext):
             
             entrarEmLista(update,context) 
         else:
-            update.message.reply_text("O Bot nao entendeu o seu comando.\nDigite um caracter válido :")
+            update.message.reply_text("O Bot não entendeu o seu comando.\nDigite um caracter válido :")
     except:
-        update.message.reply_text("O Bot nao entendeu o seu comando.\nDigite um caracter válido :")
+        update.message.reply_text("O Bot não entendeu o seu comando.\nDigite um caracter válido :")
 
 def adicionarLista(update: Update, context: CallbackContext):
       
