@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from iqoptionapi.stable_api import IQ_Option
 import time, json, sys, threading, requests, configparser, csv, os, colorama
 from datetime import datetime
@@ -78,11 +79,23 @@ def banca():
     account_balance = '${:,.2f}'.format(valor_da_banca) if API.get_currency(
     ) == 'USD' else 'R${:,.2f}'.format(valor_da_banca)
 
+=======
+import time, json, sys, threading, requests, configparser, csv, os, colorama
+from tokenize import Double
+from src.IQOption import IQLogin, ObterValorBanca, Operar,PegarStatusOperacao
+from src.Helper import ClearScreen,LeituraListaDeSinais,timestamp_converter
+
+
+ContaIQ = 'null' # sessão autenticada na IQOption
+global banca
+ciclo = 0
+>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77
 
 def configuracao():
     global vitorias, derrotas, total_operacoes, total_porcentagem
     arquivo = configparser.RawConfigParser()
     arquivo.read('config.txt')
+<<<<<<< HEAD
     vitorias = 0
     derrotas = 0
     total_operacoes = 0
@@ -127,11 +140,38 @@ valor_entrada_ciclo = float(config['entrada'])
 entrada_percentual = config['entrada_percentual']
 periodo = 20
 
+=======
+  
+   # return {'entrada': arquivo.get('GERAL', 'entrada'), 'entrada_percentual': arquivo.get('GERAL', 'entrada_percentual'), 'conta': arquivo.get('GERAL', 'conta'), 'stop_win': arquivo.get('GERAL', 'stop_win'), 'stop_loss': arquivo.get('GERAL', 'stop_loss'), 'payout': 0, 'banca_inicial': 0, 'martingale': arquivo.get('GERAL', 'martingale'), 'mgProxSinal': arquivo.get('GERAL', 'mgProxSinal'), 'valorGale': arquivo.get('GERAL', 'valorGale'), 'niveis': arquivo.get('GERAL', 'niveis'), 'analisarTendencia': arquivo.get('GERAL', 'analisarTendencia'), 'noticias': arquivo.get('GERAL', 'noticias'), 'timerzone': arquivo.get('GERAL', 'timerzone'), 'hitVela': arquivo.get('GERAL', 'hitVela'), 'telegram_token': arquivo.get('telegram', 'telegram_token'), 'telegram_id': arquivo.get('telegram', 'telegram_id'), 'usar_bot': arquivo.get('telegram', 'usar_bot'), 'email': arquivo.get('CONTA', 'email'), 'senha': arquivo.get('CONTA', 'senha'), 'trailing_stop': arquivo.get('GERAL', 'trailing_stop'), 'trailing_stop_valor': arquivo.get('GERAL', 'trailing_stop_valor'), 'payout_minimo': arquivo.get('GERAL', 'payout'), 'usar_ciclos': arquivo.get('CICLOS', 'usar_ciclos'), 'ciclos_nivel': arquivo.get('CICLOS', 'nivel_ciclos')}
+    return {
+        'email': arquivo.get('CONTA', 'email'), 
+        'senha': arquivo.get('CONTA', 'senha'),
+
+        'soros' : arquivo.get('SOROS', 'ativo'),
+        'soros-tipo' : arquivo.get('SOROS', 'tipo'),
+        'soros-nivel' : arquivo.get('SOROS', 'nivel'),
+        'soros-entrada' : arquivo.get('SOROS', 'entrada'),
+     
+    }
+
+config = configuracao()
+ContaIQ = IQLogin(config['email'], config['senha'])
+
+#status = PegarStatusOperacao(ContaIQ, 16152196031)
+
+<<<<<<<< HEAD:main.py
+#print(status)
+#time.sleep(60)
+========
+>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77
 global VERIFICA_BOT, TELEGRAM_ID
 VERIFICA_BOT = config['usar_bot']
 TELEGRAM_ID = config['telegram_id']
 Clear_Screen()
+<<<<<<< HEAD
 
+=======
+>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77
 # Teste de captura de notícias com o site botpro
 if noticias == 'S':
     try:
@@ -140,8 +180,11 @@ if noticias == 'S':
     except:
         print('Erro ao carregar json de notícias!!')
         noticias = 'N'
+<<<<<<< HEAD
 
 # PROCURAR RESPOSTA SOBRE ISSO =====================================
+=======
+>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77
 if traderTimerZone == 'S':
     try:
         timerzoner60_300 = requests.get(
@@ -151,6 +194,7 @@ if traderTimerZone == 'S':
     except:
         print('Erro ao carregar json do Trader Timer Zone!!')
         traderTimerZone = 'N'
+<<<<<<< HEAD
 
 
 def Mensagem(mensagem):
@@ -606,3 +650,258 @@ print(API.check_connect())
        ## config['banca_inicial'] = valor_da_banca
      ##   print(f"{Fore.LIGHTBLUE_EX}Saldo da conta {'demo' if account_type == 'PRACTICE' else 'real'}: {account_balance}")
       ##  break
+=======
+>>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77:old/main.py
+
+if(ContaIQ.check_connect() == True):
+    ClearScreen()
+    print("Conectado com saldo de :", ContaIQ.get_balance())
+    banca = ObterValorBanca(ContaIQ)
+    
+        
+
+    # Iniciando Atividade do BOT
+    while True:
+
+        lista = LeituraListaDeSinais()
+        soro_ganhos = 0  # valor do ultimo ganho na operação soro      
+
+ 
+        if len(lista) > 0:
+            # acompanhar oportunidade pelo console log
+            ClearScreen()
+            print('Esperando proxima oportunidade') 
+            time.sleep(1)
+
+            #status = PegarStatusOperacao(ContaIQ,order_id)
+            #print(status)
+
+            # Chegado o momento da operação
+            if(lista[0][2] == (str(timestamp_converter()).split(':')[0] + ':' +  str(timestamp_converter()).split(':')[1] )):
+            #if True:                
+                # Verifica modalidade de operação Soros
+                if config['soros'] == "S":
+
+                    # SOROS conservador ele reinicia a alavancagem na perda
+                    if config['soros-tipo'] == 'Conservador':
+                        
+                        # Realiza a operação Soro   
+                        order_id = Operar(
+                            ContaIQ, #Variavel com a autenticação da IQ
+                            lista[0][1], # Pegando a moeda
+                            (float(config['soros-entrada']) + soro_ganhos), # Calculo do valor fixo soros + o ultimo ganho
+                            lista[0][3], # Tipo de operação compra ou venda
+                            int(str(lista[0][0]).replace('M','')) # Tempo de gráfico
+                        )
+                        
+                        print('Realizou a operação e agora é necessário aguardar. Operação ' + str(order_id))
+                        time.sleep(int(str(lista[0][0]).replace('M','')) * 60 )
+                        status = PegarStatusOperacao(ContaIQ,order_id)
+                        print(status)
+                        # Se perdeu a operação irá zerar os soros e tambem o ciclo
+                        if(status[0] == False) :
+                            soro_ganhos = 0
+                            ciclo = 0
+                            time.sleep(5)
+                            print('Perdeu')
+                                
+                        # Ganhar irá aumentar a contagem do ciclo ou zerar caso tenha chegado ao limite de Soros
+                        else:
+                            print(status)
+                            print('ganhou')                            
+                            ciclo += 1
+                            soro_ganhos = 0.80
+                          
+
+
+                    # SOROS Agressivo ele nao reicinia a alavancagem na perda
+                    if config['soros-tipo'] == 'Agressivo':
+                        
+                        # Realiza a operação Soro   
+                        order_id = Operar(
+                            ContaIQ, #Variavel com a autenticação da IQ
+                            lista[0][1], # Pegando a moeda
+                            (float(config['soros-entrada']) + soro_ganhos), # Calculo do valor fixo soros + o ultimo ganho
+                            lista[0][3], # Tipo de operação compra ou venda
+                            int(str(lista[0][0]).replace('M','')) # Tempo de gráfico
+                        )
+                        
+                        print('Realizou a operação e agora é necessário aguardar')
+                        time.sleep(int(str(lista[0][0]).replace('M','')) * 60 )
+                        status = PegarStatusOperacao(ContaIQ,order_id)
+                                
+                        print(status)
+                        ciclo += 1
+                        soro_ganhos = 0.80
+                        time.sleep(60)
+
+
+                    # Verifica se é necessario resetar o ciclo do soro
+                    if(ciclo <= int(config['soros-nivel'])): 
+                        ciclo = 0
+                        soro_ganhos = 0
+
+                    time.sleep(60)
+
+                    # SOROS agressivo conserva o aumento da aposta
+                # if config['soros-tipo'] == 'Agressivo':
+
+                # print(lista)
+                
+
+            
+
+
+            
+
+
+
+
+
+
+
+
+
+<<<<<<<< HEAD:main.py
+========
+API.connect()
+API.change_balance(config['conta'])
+while True:
+    if API.check_connect() == False:
+        print('>> Erro ao se conectar!\n')
+        input('   Aperte enter para sair')
+        sys.exit()
+    else:
+        print(
+            f'>> Conectado com sucesso!\n {Fore.RED}TESTE BOT INFINITY TEC!!!\n')
+        banca()
+        config['banca_inicial'] = valor_da_banca
+        print(f"{Fore.LIGHTBLUE_EX}Saldo da conta {'demo' if account_type == 'PRACTICE' else 'real'}: {account_balance}")
+        break
+try:
+    buscarMenor()
+    while True:
+
+
+        if config['soros'] == 'S':  
+            soros()
+        
+        
+        else:
+            timeNow = timestamp_converter()
+            data_hora = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            print(data_hora, end='\x1b[K\r')
+            for row in em_espera:
+                horario = row[2]
+                if galeRepete:
+                    par = parAntigo
+                    direcao = direcaoAntigo
+                    timeframe = timeframeAntigo
+                    valor_entrada = valorGaleProxSinal
+                else:
+                    par = row[1].upper()
+                    direcao = row[3].lower()
+                    timeframe_retorno = timeFrame(row[0])
+                    timeframe = 0 if (timeframe_retorno ==
+                                    'error') else timeframe_retorno
+                    if config['usar_ciclos'] == 'S':
+                        valor_entrada = valor_entrada_ciclo
+                        stop_win = abs(float(config['stop_win']))
+                        stop_loss = float(config['stop_loss']) * -1.0
+                    elif entrada_percentual == 'S':
+                        valor_entrada = int(
+                            (float(config['entrada']) / 100) * (valor_da_banca + lucroTotal))
+                        percentual_loss = float(config['stop_loss'])
+                        percentual_gain = float(config['stop_win'])
+                        stop_loss = int((percentual_loss / 100)
+                                        * valor_da_banca) * -1
+                        stop_win = int((percentual_gain / 100) * valor_da_banca)
+                    else:
+                        valor_entrada = float(config['entrada'])
+                        stop_win = abs(float(config['stop_win']))
+                        stop_loss = float(config['stop_loss']) * -1.0
+                if len(horario) == 5:
+                    s = horario + ":00"
+                else:
+                    s = horario
+                f = '%H:%M:%S'
+                dif = (datetime.strptime(timeNow, f) -
+                    datetime.strptime(s, f)).total_seconds()
+
+                if (dif == -40) and get_profit == True:
+                    get_profit = False
+                    Get_All_Profit()
+                    paridades_fechadas = []
+
+                if dif == -20:
+                    opcao, payout = checkProfit(par, timeframe)
+                    if not opcao:
+                        paridades_fechadas.append(par)
+
+                if dif == -2:
+                    impacto, moeda, hora, stts = noticas(par)
+                    if stts:
+                        print(
+                            f' NOTÍCIA COM IMPACTO DE {impacto} TOUROS NA MOEDA {moeda} ÀS {hora}!\n')
+                        time.sleep(1)
+                    else:
+                        if timerzone(int(timeframe)):
+                            print('HORÁRIO NÃO RECOMENDADO PELO TIMERZONE!')
+                            time.sleep(1)
+                        else:
+                            
+                            
+                            if analisarTendencia == 'S':
+                                tend = Verificar_Tendencia(par, timeframe)
+                            else:
+                                tend = direcao
+
+                            if hitdeVela == 'S':
+                                hit = Filtro_Hit_Vela(par, timeframe)
+                            else:
+                                hit = False
+
+                            if tend != direcao:
+                                print(f' PARIDADE {par} CONTRA TENDÊNCIA!\n')
+                                time.sleep(1)
+
+                            else:
+                                if hit:
+                                    print(f' HIT DE VELA NA PARIDADE {par}!\n')
+                                    time.sleep(1)
+
+                                elif par not in paridades_fechadas and payout >= payout_minimo:
+                                    thread_ativas = threading.active_count()
+                                    if config['usar_ciclos'] == 'S' and thread_ativas > 2:
+                                        print(
+                                            ' OPERAÇÃO EM ANDAMENTO. ABORTANDO ENTRADA!')
+                                        time.sleep(5)
+                                        break
+                                    else:
+                                        operar(valor_entrada, par, direcao,
+                                            timeframe, horario, opcao, payout)
+                                    if config['usar_ciclos'] == 'S':
+                                        break
+                                else:
+                                    if par in paridades_fechadas:
+                                        print(f' PARIDADE {par} FECHADA!\n')
+                                    else:
+                                        print(
+                                            ' PAYOUT ABAIXO DO MINIMO ESTABELECIDO!\n')
+                                        time.sleep(1)
+
+                if dif > 0:
+                    buscarMenor()
+                    break
+            verificarStop()
+            time.sleep(0.5)
+
+except KeyboardInterrupt:
+    banca()
+    mensagem = f'Operações: {total_operacoes} | Vencedoras: {vitorias} | Perdedoras: {derrotas}\nAssertividade: {total_porcentagem}%\n'
+    mensagem += f"Saldo da conta {'demo' if account_type == 'PRACTICE' else 'real'}: {account_balance}"
+    print(f'{Fore.BLUE}{mensagem}')
+    Mensagem(mensagem)
+    exit()
+>>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77:old/main.py
+>>>>>>> f55f991f3683fb603e5e2f163d8e099a28329a77
