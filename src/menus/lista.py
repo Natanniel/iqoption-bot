@@ -17,7 +17,7 @@ def entrarEmLista(update: Update, context: CallbackContext):
     keyBoard1 = ReplyKeyboardMarkup(mainbutton , resize_keyboard=True)
     mensagem = 'Lista de Sinais \n\n'
     
-    cliente,gerenciamento,gerenciamento_mao_fixa,lista = retornaTodosDadosDoUsuario(update.message.chat_id)
+    cliente,gerenciamento,gerenciamento_mao_fixa,lista,martingale = retornaTodosDadosDoUsuario(update.message.chat_id)
 
     if(len(lista) > 0):
         for sinal in lista:

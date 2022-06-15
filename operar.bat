@@ -1,1 +1,1 @@
-python operador.py
+py operador.py

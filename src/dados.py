@@ -71,6 +71,7 @@ def retornaTodosDadosDoUsuario(chatID):
    cliente = []
    gerenciamento = []
    gerenciamento_mao_fixa = []
+   martingale = []
    lista = []
    
    for row in cur.execute("SELECT * FROM clientes where chat_id = '"+ str(chatID)+"' "):
@@ -80,11 +81,14 @@ def retornaTodosDadosDoUsuario(chatID):
       for row2 in cur.execute("SELECT * FROM mao_fixa where cliente = "+ str(row[0])+" "):
          gerenciamento_mao_fixa.append(row2)
       for row2 in cur.execute("SELECT * FROM lista where cliente = "+ str(row[0])+ ""):
-         lista.append(row2)        
+         lista.append(row2)   
+      for row2 in cur.execute("SELECT * FROM martingale where cliente = "+ str(row[0])+ ""):
+         martingale.append(row2)       
+      
 
    con.commit()
    con.close()
-   return cliente,gerenciamento,gerenciamento_mao_fixa,lista
+   return cliente,gerenciamento,gerenciamento_mao_fixa,lista,martingale
 
 def entrarModoAlteracao(chatID, modo_alteracao, modo_alteracao_passo):
    con = sqlite3.connect("database.db")
