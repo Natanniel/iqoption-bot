@@ -18,13 +18,13 @@ import os
 from src.dados import retornaTodosDadosDoUsuario, verificarUsuarioTemChatLogado, VinculaContaAoChatID, configurarBaseDeDados, verificaEmailExisteBaseDeDados, entrarModoAlteracao, verificaUsuarioEmAlteracao
 
 from src.menus.gerenciamento import entrarEmGerenciamento, alterarTipoOperacao, alterarDelay, alterarStopWin, alterarStopLoss,  alterarEmailIQ, alterarSenhaIQ
-from src.menus.modooperacao import entrarEmModoOperacao, entrarEmModoMartinGale, entrarEmModoMaoFixa, alterarMaoFixa
+from src.menus.modooperacao import alterarSorosPorcentagem,alterarSoros, entrarEmModoOperacao, entrarEmModoSoros, entrarEmModoMartinGale,alterarMartinGale, entrarEmModoMaoFixa, alterarMaoFixa
 from src.menus.lista import entrarEmLista, limparLista, adicionarLista
 from src.menus.operar import entrarEmOperar,  cancelarOperacao, confirmarOperacao, interromperOperacao
 #from core.usuario import verificaEmailCadastrado
 
 updater = Updater(
-    "5389773517:AAEzhBQZ5vTExZ7MsA77OzTKhtbdgjoWctM", use_context=True)
+    "5394945805:AAFOW80oCpvDCZgGK6VrZ6U2qN_n_U6iS7o", use_context=True)
 
 #updater = Updater("5394945805:AAFOW80oCpvDCZgGK6VrZ6U2qN_n_U6iS7o", use_context=True)
 
@@ -33,6 +33,7 @@ updater = Updater(
 #   1 - Inicializar atravez do comando start
 #   2 - Solicitar ao usuario o email cadastrado
 #   3 -
+
 
 # inicializar o processo do BOT
 def start(update: Update, context: CallbackContext):
@@ -76,7 +77,7 @@ def verificaComandosDeAlteracao(mensagem):
     if(mensagem == 'Alterar Gerenciamento' or mensagem == 'Conta IQOption'):
         alteracao = True
 
-    if(mensagem == 'Alterar mão fixa'):
+    if(mensagem == 'Alterar mão fixa' or mensagem == 'Alterar Martin-gale' or mensagem == 'Alterar Soros'):
         alteracao = True
 
     if(mensagem == '❌ Limpar Lista' or mensagem == '✅ Adicionar Sinais'):
@@ -113,6 +114,14 @@ def alteracao(update: Update, context: CallbackContext):
     if(cliente[0][5] == 3):
         if(cliente[0][6] == 1):
             alterarMaoFixa(update, context)
+        if(cliente[0][6] == 2):
+            alterarMartinGale(update, context)
+        if(cliente[0][6] == 3):
+            alterarSoros(update, context)
+        if(cliente[0][6] == 4):
+            alterarSorosPorcentagem(update, context)
+
+     
 
     # Lista
     # Operações
@@ -131,7 +140,7 @@ def alteracao(update: Update, context: CallbackContext):
             if(update.message.text == '🤖✅ Confirmar'):
                 confirmarOperacao(update, context)
 
-            if(update.message.text == '🤖❌ Cancelar'):
+            if(update.message.text == 'Voltar'):
                 cancelarOperacao(update, context)
 
     # operar
@@ -140,8 +149,13 @@ def alteracao(update: Update, context: CallbackContext):
         if(update.message.text == '❌ Interromper'):
             interromperOperacao(update, context)
         else:
-            update.message.reply_text(
-                "🤖 Desculpe ! \n\nEnquanto estou em operação, não posso realizar outros comandos. Você pode interromper o serviço a qualquer momento.")
+
+            mainbutton = [
+                ['❌ Interromper']
+            ]
+    
+            keyBoard1 = ReplyKeyboardMarkup(mainbutton , resize_keyboard=True)  
+            update.message.reply_text("🤖 Desculpe ! \n\nEnquanto estou em operação, não posso realizar outros comandos. Você pode interromper o serviço a qualquer momento.", reply_markup= keyBoard1)
 
 
 def recepcionar(update: Update, context: CallbackContext):
@@ -187,14 +201,23 @@ def recepcionar(update: Update, context: CallbackContext):
                             "Informe o valor de Delay para cada operação :")
 
                     if(update.message.text == 'Conta IQOption'):
-                        entrarModoAlteracao(update.message.chat_id, 2, 1)
+                        entrarModoAlteracao(update.message.chat_id, 2, 2)
                         update.message.reply_text(
-                            "Informe seu email na IQOption :")
+                            "Informe sua senha na IQOption :")
 
                     if(update.message.text == 'Alterar mão fixa'):
                         entrarModoAlteracao(update.message.chat_id, 3, 1)
                         update.message.reply_text(
                             "Informe o novo valor de mão fixa :")
+
+                    if(update.message.text == 'Alterar Martin-gale'):
+                        entrarModoAlteracao(update.message.chat_id, 3, 2)
+                        update.message.reply_text(
+                            "Informe o novo valor para niveis de martin-gale :")
+                        
+                    if(update.message.text == 'Alterar Soros'):
+                        entrarModoAlteracao(update.message.chat_id, 3, 3)
+                        update.message.reply_text("Informe o novo valor para niveis de soros :")
 
                     if(update.message.text == '❌ Limpar Lista'):
                         entrarModoAlteracao(update.message.chat_id, 10, 1)
@@ -236,21 +259,26 @@ def recepcionar(update: Update, context: CallbackContext):
                                                     update, context)
 
                                             else:
-                                                if(update.message.text == '🤖 Operar'):
-                                                    entrarEmOperar(
-                                                        update, context)
-                                                 #   os.system('python operador.py ' + str(update.message.chat_id))
-                                                 #   update.message.reply_text("Falha ao se comunicar com a IQOption")
+                                                if(update.message.text == '↗️ Soros'):
+                                                    entrarEmModoSoros(update,context)
+                                                
 
                                                 else:
-
-                                                  
-                                                    if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
-                                                        update.message.reply_text(
-                                                            "Por favor informe um email válido")
-                                                    else:
-                                                        validarEmail(
+                                                    if(update.message.text == '🤖 Operar'):
+                                                        entrarEmOperar(
                                                             update, context)
+                                                    #   os.system('python operador.py ' + str(update.message.chat_id))
+                                                    #   update.message.reply_text("Falha ao se comunicar com a IQOption")
+
+                                                    else:
+
+                                                    
+                                                        if not re.match(r"[^@]+@[^@]+\.[^@]+", update.message.text):
+                                                            update.message.reply_text(
+                                                                "Por favor informe um email válido")
+                                                        else:
+                                                            validarEmail(
+                                                                update, context)
 
     else:
         validarEmail(update, context)

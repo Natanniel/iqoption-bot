@@ -4,7 +4,7 @@ from iqoptionapi.stable_api import IQ_Option
 
 def verificarSaldo(chat_id):
     saldo = 0
-    cliente,gerenciamento,gerenciamento_mao_fixa,lista,martingale = retornaTodosDadosDoUsuario(chat_id)    
+    cliente,gerenciamento,gerenciamento_mao_fixa,lista,martingale,soros = retornaTodosDadosDoUsuario(chat_id)    
     
     iqoptionConfigurado = False
     

@@ -16,7 +16,7 @@ def entrarEmModoOperacao(update: Update, context: CallbackContext):
 
     mainbutton = [
         ['🖐️ Mão Fixa','🔂 Margin-Gale'],
-        ['Voltar']
+        ['↗️ Soros'],['Voltar']
     ]
     
     keyBoard1 = ReplyKeyboardMarkup(mainbutton , resize_keyboard=True)

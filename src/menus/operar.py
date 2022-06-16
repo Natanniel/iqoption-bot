@@ -17,19 +17,36 @@ def entrarEmOperar(update: Update, context: CallbackContext):
         ['Voltar']
     ]
     
+    cliente,gerenciamento,gerenciamento_mao_fixa,lista,martingale,soros = retornaTodosDadosDoUsuario(update.message.chat_id)
+
     keyBoard1 = ReplyKeyboardMarkup(mainbutton , resize_keyboard=True)
-    mensagem = 'OPERAR \n\n'
-    mensagem += 'Por favor, confirme a ordem de operacao ou retorne ao menu principal e configure o robo novamente.'
+    mensagem = '*OPERAR*\n\n'
+    mensagem += '___Por favor, confirme a ordem de operação ou retorne ao menu principal e configure o robo novamente.___\n\n'
+
+    mensagem += '*🎯 SINAIS*\n'
+    mensagem += '*Qtd* : ' + str(len(lista)) + '\n\n'
+    
+    mensagem += '*⚙️ CONFIGURAÇÂO* : ' + str(len(lista)) + '\n'
+    mensagem += '*🖐️ Mão Fixa* \n'
+
     executarComando("update clientes set modo_alteracao_passo = 0, modo_alteracao = 20 where chat_id = '" + str(update.message.chat_id) + "'")
     
    
-    update.message.reply_text(mensagem, reply_markup= keyBoard1)
+    update.message.reply_text(mensagem, reply_markup= keyBoard1, parse_mode='Markdown')
 
 
    
 def cancelarOperacao(update: Update, context: CallbackContext):
     executarComando("update clientes set modo_alteracao_passo = 0, modo_alteracao = 0 where chat_id = '" + str(update.message.chat_id) + "'")
-    interromperOperacao(update,context)
+    mainbutton = [
+        ['🧠 Gerênciamento','⚙️ Modo de Operação'],
+        ['🎯 Lista','🚨 Suporte'],
+        ['🤖 Operar']
+    ]
+
+    keyBoard1 = ReplyKeyboardMarkup(mainbutton , resize_keyboard=True)
+    message_reply_text = 'Menu principal'
+    update.message.reply_text(message_reply_text, reply_markup= keyBoard1)
 
     
 def confirmarOperacao(update: Update, context: CallbackContext):
