@@ -10,7 +10,7 @@ from datetime import timedelta
 
 chat_id = 0
 updater = Updater(
-    "5389773517:AAEzhBQZ5vTExZ7MsA77OzTKhtbdgjoWctM", use_context=True)
+    "5394945805:AAFOW80oCpvDCZgGK6VrZ6U2qN_n_U6iS7o", use_context=True)
 #for parametro in sys.argv:
 #    chat_id = parametro
 chat_id = 782375549
@@ -18,8 +18,7 @@ chat_id = 782375549
 
 
 
-cliente, gerenciamento, gerenciamento_mao_fixa, lista, martingale = retornaTodosDadosDoUsuario(
-    chat_id)
+cliente, gerenciamento, gerenciamento_mao_fixa, lista, martingale,soros = retornaTodosDadosDoUsuario(chat_id)
 
 
 real = 'REAL'
@@ -27,7 +26,7 @@ if gerenciamento[0][5] == False:
     real = 'PRACTICE'
 
 # Valida conexão com IQOption
-API = IQ_Option(gerenciamento[0][6], gerenciamento[0][7], real)
+API = IQ_Option(cliente[0][1], gerenciamento[0][7], real)
 API.connect()
 conexao = API.check_connect()
 
@@ -38,14 +37,114 @@ if conexao == False:
 
 
 ## VARIAVEIS GLOBAIS ==================================
-saldoInicial = API.get_balance() #Saldo inicial
-saldoAtual = 0  # Saldo atual do usuario
+ativo = True  # Verifica se o processo ainda esta ativo
+saldoInicial = float(API.get_balance()) #Saldo inicial
+saldoAtual = float(API.get_balance())   # Saldo atual do usuario
+
+stopLoss = float(saldoInicial - gerenciamento[0][3])
+stopWin = float(saldoInicial + gerenciamento[0][2])
+
+
 lucro = 0 # Total perdido
 loss = 0 # Total ganho
-ativo = True  # Verifica se o processo ainda esta ativo
-valorEntrada = 0 
+valorEntrada = 0  # Valor entrada
 
 quantidadeEntradas = 0 # Numero de entradas realizadas
+
+
+def iniciar():
+    global ativo,cliente,gerenciamento,gerenciamento_mao_fixa, lista, martingale,soros,saldoInicial,saldoAtual,stopLoss,stopWin,lucro,loss,valorEntrada,quantidadeEntradas
+
+    while(ativo):
+
+        cliente, gerenciamento, gerenciamento_mao_fixa, lista, martingale,soros = retornaTodosDadosDoUsuario(chat_id)
+
+        if(len(lista)):
+
+
+            
+
+            for sinal in lista:
+                if(sinal[6] == 0):
+
+                    dataHoraAtual = datetime.datetime.now()
+                    horaSinal = datetime.datetime(year=dataHoraAtual.year, month=dataHoraAtual.month, day=dataHoraAtual.day, hour=int(sinal[4].split(":")[0]), minute=int(sinal[4].split(":")[1]), second=int(sinal[4].split(":")[2]))
+                    horaSinal = horaSinal - timedelta(minutes=30)
+                    
+                    if dataHoraAtual > horaSinal:
+                        operarSinal(sinal)
+                        
+
+
+        # VERIFICAR STOP-LOSS
+        #if(saldoAtual <= stopLoss):
+        #    stopLoss()
+        
+        # VERIFICAR STOP-WIN
+       # if(saldoAtual >= stopWin):
+       #     stopWin()
+
+        #if(cliente[0][7] != 99):
+         #   ativo = False
+
+    
+## ESTA FUNÇÂO NOTIFICA O CLIENTE DE QUE O SINAL FOI CAPTURADO E ORQUESTRA AS OPERACOES
+def operarSinal(sinal):
+    parAtivos = sinal[3]
+    horaSinal = sinal[4]
+    tendencia = sinal[5]
+    time = sinal[2]
+
+    mensagem = "*🤖 PROXIMO DO SINAL* \n\n"
+    mensagem += "*ATIVO* : " + str(parAtivos) + '\n'
+    mensagem += "*SINAL* : " + str(horaSinal) + '\n'
+    mensagem += "*TENDÊNCIA* : " + str(tendencia) + '\n'
+    mensagem += "*TEMPO* : " + str(time) + '\n'
+    enviarMensagem(mensagem)
+
+    # AGUARDA ATÉ O MOMENTO DE COMPRA DO SINAL
+    entrou = False
+    while entrou == False:
+       
+        dataHoraAtual = datetime.datetime.now()
+        horaSinal = datetime.datetime(year=dataHoraAtual.year, month=dataHoraAtual.month, day=dataHoraAtual.day, hour=int(sinal[4].split(":")[0]), minute=int(sinal[4].split(":")[1]), second=int(sinal[4].split(":")[2]))
+        delay = gerenciamento[0][1]
+        horaSinal = horaSinal - timedelta(seconds==float(delay))
+       
+
+        if dataHoraAtual > horaSinal:
+            comprar()
+            
+
+
+def stopLoss():
+    desativarRobo()
+
+def stopWin():
+    desativarRobo()
+
+
+
+
+
+def enviarMensagem(mensagem):
+   updater.bot.send_message(chat_id, mensagem, parse_mode='Markdown')
+
+
+
+
+def desativarRobo():
+    ativo = False
+
+def comprar(entrada,ativos,tempo,acao):
+    idEntrada = API.buy(entrada,ativos,acao,tempo)
+
+iniciar()
+
+
+
+
+
 
 
 def operarSinal(sinal):
@@ -149,38 +248,40 @@ def verificaStopEMandaResumo():
     ativo = False
 
 
-while ativo:
+def whilee(): 
 
-    cliente, gerenciamento, gerenciamento_mao_fixa, lista, martingale = retornaTodosDadosDoUsuario(
-        chat_id)
+    while ativo:
 
-    if(cliente[0][7] != 99):
-        ativo = False
+        cliente, gerenciamento, gerenciamento_mao_fixa, lista, martingale = retornaTodosDadosDoUsuario(
+            chat_id)
 
-    if(len(lista)):
+        if(cliente[0][7] != 99):
+            ativo = False
 
-        # Modalidades de operação
-        operarMaoFixa = True
+        if(len(lista)):
 
-        #
-        proximaEntrada = []
+            # Modalidades de operação
+            operarMaoFixa = True
 
-        # Hora de pegar o proximo sinal com menos de 10 minutos para entrar
-        horaAtual = datetime.datetime.now()
+            #
+            proximaEntrada = []
 
-        for sinal in lista:
-            dataHoraAtual = datetime.datetime.now()
+            # Hora de pegar o proximo sinal com menos de 10 minutos para entrar
+            horaAtual = datetime.datetime.now()
 
-            horaSinal = datetime.datetime(year=dataHoraAtual.year, month=dataHoraAtual.month, day=dataHoraAtual.day, hour=int(
-                sinal[4].split(":")[0]), minute=int(sinal[4].split(":")[1]), second=int(sinal[4].split(":")[2]))
+            for sinal in lista:
+                dataHoraAtual = datetime.datetime.now()
 
-            sinalFinal = horaSinal + timedelta(minutes=1)
-            if dataHoraAtual < sinalFinal:
-                operarSinal(sinal)
+                horaSinal = datetime.datetime(year=dataHoraAtual.year, month=dataHoraAtual.month, day=dataHoraAtual.day, hour=int(
+                    sinal[4].split(":")[0]), minute=int(sinal[4].split(":")[1]), second=int(sinal[4].split(":")[2]))
 
-        # valida se ainda esta com alteração/operacao ativo
-        ativo = verificaUsuarioEmAlteracao(chat_id)
+                sinalFinal = horaSinal + timedelta(minutes=1)
+                if dataHoraAtual < sinalFinal:
+                    operarSinal(sinal)
 
-    else:
-        updater.bot.send_message(chat_id, 'Lista de operacoes finalizadas')
-        ativo = False
+            # valida se ainda esta com alteração/operacao ativo
+            ativo = verificaUsuarioEmAlteracao(chat_id)
+
+        else:
+            updater.bot.send_message(chat_id, 'Lista de operacoes finalizadas')
+            ativo = False

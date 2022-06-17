@@ -23,15 +23,27 @@ def entrarEmOperar(update: Update, context: CallbackContext):
     mensagem = '*OPERAR*\n\n'
     mensagem += '___Por favor, confirme a ordem de operação ou retorne ao menu principal e configure o robo novamente.___\n\n'
 
-    mensagem += '*🎯 SINAIS*\n'
-    mensagem += '*Qtd* : ' + str(len(lista)) + '\n\n'
+    mensagem += '*🎯 SINAIS* : ' + str(len(lista)) + '\n\n'
     
-    mensagem += '*⚙️ CONFIGURAÇÂO* : ' + str(len(lista)) + '\n'
-    mensagem += '*🖐️ Mão Fixa* \n'
+    mensagem += '*⚙️ CONFIGURAÇÂO* \n\n'
+    conta = "REAL"
+    if gerenciamento[0][1] == 0:
+        conta = "DEMO"
+
+
+    mensagem += '*Operar em conta * :' + conta + ' \n'
+    mensagem += '*Delay* :' + str(gerenciamento[0][1]) + ' \n'
+    mensagem += '*Valor entrada* :' + str(gerenciamento_mao_fixa[0][2]) + ' \n'
+    mensagem += '*Niveis de martin-gale* :' + str(martingale[0][2]) + '\n'
+    mensagem += "*Niveis de soros* :" + str(soros[0][2]) + '\n'    
+    mensagem += "*Percentual de soros* :" + str(soros[0][3]) + '%\n\n'
+
+    mensagem += '*⚠️ STOPS* \n\n'
+    mensagem += "*STOP WIN* : R$ " + str(gerenciamento[0][2]) + '\n'
+    mensagem += "*STOP LOSS* : R$ " +  str(gerenciamento[0][3]) + '\n'
+
 
     executarComando("update clientes set modo_alteracao_passo = 0, modo_alteracao = 20 where chat_id = '" + str(update.message.chat_id) + "'")
-    
-   
     update.message.reply_text(mensagem, reply_markup= keyBoard1, parse_mode='Markdown')
 
 
@@ -52,7 +64,6 @@ def cancelarOperacao(update: Update, context: CallbackContext):
 def confirmarOperacao(update: Update, context: CallbackContext):
     executarComando("update clientes set modo_alteracao_passo = 0, modo_alteracao = 99 where chat_id = '" + str(update.message.chat_id) + "'")
     subprocess.Popen('py bot_operador.py ' + str(update.message.chat_id))
-
 
     mainbutton = [
         ['❌ Interromper']
